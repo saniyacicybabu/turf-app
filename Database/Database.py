@@ -1,5 +1,5 @@
 import sqlite3
-from Entities import User
+# from Entities import User
 
 
 class Database:
