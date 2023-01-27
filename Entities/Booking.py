@@ -13,17 +13,17 @@ class Booking:
         self.cost = cost
 
     def __str__(self):
-        return "Booking id:{} Turf Id:{} User id:{} Status:{} Start time:{} Duration:{} Cost:{}".format(self.id, self.turfId, self.userId, self.status, self.startTime, self.duration, self.cost)
+        return "Booking id:{} Turf Id:{} User id:{} Status:{} Start time:{} Duration:{} Hours Cost:Rs.{}".format(self.id, self.turfId, self.userId, self.status, self.startTime, self.duration, self.cost)
 
     @staticmethod
     def getAllBooking():
         response = Database().getAllBookings()
         bookings = []
         for elem in response:
-            bookings.append(Booking(elem.id, elem.turfId, elem.userId,
-                            elem.status, elem.startTime, elem.duration, elem.cost))
+            bookings.append(Booking(elem[0], elem[1], elem[2],
+                            elem[3], elem[4], elem[5], elem[6]))
         return bookings
 
     @staticmethod
     def save(booking):
-        Database().saveBooking(booking);
+        Database().saveBooking(booking)

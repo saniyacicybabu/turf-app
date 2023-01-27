@@ -1,6 +1,7 @@
 from Entities.User import User
 from Entities.Turf import Turf
 from Entities.Manager import Manager
+from Entities.Booking import Booking
 
 
 class Admin(User):
@@ -34,7 +35,7 @@ class Admin(User):
         turfs = Turf.printTurfs()
         for turf in turfs:
             print(turf)
-        turfId = int(input("Enter turf id to assign manager: "))
+        turfId = int(input("Enter turf id to set price: "))
         try:
             turf = list(filter(lambda x: (x.id == turfId), turfs))[0]
         except:
@@ -53,7 +54,7 @@ class Admin(User):
         turf.addToDatabase()
 
     def viewBookings(self):
-        pass
+        self.bookingHistory()
 
     def addUser(self):
         name = input("Enter username: ")

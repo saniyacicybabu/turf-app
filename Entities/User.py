@@ -39,11 +39,12 @@ class User:
             start = int(booking.startTime[9:11])
             for i in range(start, start+booking.duration):
                 currentBookingHours.append(i)
+        # TODO modify to include duration also
         return not int(startTime[9:11]) in currentBookingHours
 
     def checkAvailability(self):
         self.checkTurf()
-        turfId = int(input("Enter turf Id"))
+        turfId = int(input("Enter turf Id: "))
         startTime = input("Enter date and time in DD-MM-YY HH format: ")
         if(self.checkTurfavailable(turfId, startTime)):
             print("Turf available at given time")
@@ -51,20 +52,48 @@ class User:
             print("Turf not available at given time")
 
     def bookTurf(self):
-        turfId = int(input("Enter turf Id"))
+        turfId = int(input("Enter turf Id: "))
         startTime = input("Enter date and time in DD-MM-YY HH format: ")
+        duration = input("Enter No. of hours turf is needed: ")
         if(self.checkTurfavailable(turfId, startTime)):
             # TODO create booking object and save to db
-            # Booking(0, turfId, self.id, "DRAFT", startTime, duration, cost)
-            pass
+            booking = Booking(0, turfId, self.id, "PENDING",
+                              startTime, duration, 0)
+            Booking.save(booking)
         else:
             print("Turf not available at given time")
 
     def bookingHistory(self):
-        pass
+        userMap = {}
+        turfMap = {}
+        turfList = []
+        for user in User.getAllUsers():
+            userMap[user.id] = user
+        for turf in Turf.printTurfs():
+            turfMap[turf.id] = turf
+            if(turf.managerId == self.id and self.userType == "MANAGER"):
+                turfList.append(turf.id)
+        bookings = Booking.getAllBooking()
+        if(self.userType == "MANAGER"):
+            bookings = list(
+                filter(lambda booking: booking.turfId in turfList, bookings))
+        elif(self.userType == "NORMAL"):
+            bookings = list(
+                filter(lambda booking: booking.userId == self.id, bookings))
+        for booking in bookings:
+            print("BookingId:{} User:{} Status:{} TurfName:{} StartTime:{} Duration:{}Hrs Cost:Rs.{}".format(
+                booking.id, userMap[booking.userId].name, booking.status, turfMap[booking.turfId].name, booking.startTime, booking.duration, booking.cost))
 
     def addToDatabase(self):
         Database().addUserToDataBase(self)
+
+    @staticmethod
+    def getAllUsers():
+        usersList = Database().getAllUsers()
+        users = []
+        for user in usersList:
+            users.append(User(user[0], user[1], None))
+        return users
 
     def printMenu(self):
         option = 1
