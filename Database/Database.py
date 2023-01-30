@@ -10,6 +10,7 @@ class Database:
         file.close()
         for query in queries:
             conn.execute(query)
+        conn.commit()  
         conn.close()
 
     def addUserToDataBase(self, user):
