@@ -10,13 +10,12 @@ class Database:
         file.close()
         for query in queries:
             conn.execute(query)
-        conn.commit()  
         conn.close()
 
     def addUserToDataBase(self, user):
         conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
-        query = "INSERT INTO USER (NAME, PASSWORD, USER_TYPE, IS_ACTIVE) VALUES ('{}','{}','{}',1)".format(
-            user.name, user.password, user.userType)
+        query = "INSERT INTO USER (NAME, PASSWORD, USER_TYPE, IS_ACTIVE, PHONE, EMAIL) VALUES ('{}','{}','{}',1,{},'{}')".format(
+            user.name, user.password, user.userType, user.phone, user.email)
         conn.execute(query)
         conn.commit()
         conn.close()
@@ -102,7 +101,6 @@ class Database:
         conn.commit()
         conn.close()
         return output
-
 
 
 if __name__ == "__main__":
