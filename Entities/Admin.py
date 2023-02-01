@@ -60,11 +60,13 @@ class Admin(User):
         name = input("Enter username: ")
         password = input("Enter password: ")
         userType = input("Enter user type - 1.Manager 2.Normal: ")
+        phone = int(input("Enter user phone number: "))
+        email = input("Enter user email id: ")
         user = None
         if(userType == "1"):
-            user = User(0, name, password, "MANAGER")
+            user = User(0, name, password, "MANAGER", 1, phone, email)
         else:
-            user = User(0, name, password)
+            user = User(0, name, password, "MANAGER", 1, phone, email)
         user.addToDatabase()
 
     def printMenu(self):

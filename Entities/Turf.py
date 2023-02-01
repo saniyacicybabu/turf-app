@@ -9,12 +9,13 @@ class Turf:
         self.location = location
         self.bookingRate = bookingRate
         self.managerId = managerId
+        self.db= Database()
 
     def __str__(self):
         return "ID:{} Name:{} Location:{} BookingRate:{}".format(self.id, self.name, self.location, self.bookingRate)
 
     def addToDatabase(self):
-        Database().addTurfToDataBase(self)
+        self.db.addTurfToDataBase(self)
 
     @staticmethod
     def printTurfs():

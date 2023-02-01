@@ -5,17 +5,21 @@ from Entities.Booking import Booking
 
 class User:
 
-    def __init__(self, id, name, password, userType="NORMAL"):
+    def __init__(self, id, name, password, userType="NORMAL", isActive=1, phone=None, email=None):
         self.id = id
         self.name = name
         self.password = password
         self.userType = userType
+        self.isActive = isActive
+        self.phone = phone
+        self.email = email
+        self.db = Database()
 
     def __str__(self):
         return "ID:{} Name:{}".format(self.id, self.name)
 
     def login(self):
-        responseList = Database().login(self)
+        responseList = self.db.login(self)
         if(responseList == []):
             return None
         userInfo = responseList[0]
@@ -85,7 +89,7 @@ class User:
                 booking.id, userMap[booking.userId].name, booking.status, turfMap[booking.turfId].name, booking.startTime, booking.duration, booking.cost))
 
     def addToDatabase(self):
-        Database().addUserToDataBase(self)
+        self.db.addUserToDataBase(self)
 
     @staticmethod
     def getAllUsers():
