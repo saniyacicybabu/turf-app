@@ -4,12 +4,14 @@ from Entities.Booking import Booking
 
 
 class User:
+    """User class to store and modify the details of customers of Turf"""
 
-    def __init__(self, id, name, password, userType="NORMAL", isActive=1, phone=None, email=None):
+    def __init__(self, id, name, password, user_type="NORMAL", isActive=1, phone=None, email=None):
+        """Constructor to intialise user details"""
         self.id = id
         self.name = name
         self.password = password
-        self.userType = userType
+        self.user_type = user_type
         self.isActive = isActive
         self.phone = phone
         self.email = email
@@ -19,87 +21,96 @@ class User:
         return "ID:{} Name:{}".format(self.id, self.name)
 
     def login(self):
-        responseList = self.db.login(self)
-        if(responseList == []):
+        """Function to authenticate user credentials"""
+        response_list = self.db.login(self)
+        if(response_list == []):
             return None
-        userInfo = responseList[0]
+        userInfo = response_list[0]
         return User(userInfo[0], userInfo[1], userInfo[2], userInfo[3])
 
-    def checkTurf(self):
+    def check_turf(self):
+        """Function to print available turf in specified location"""
         location = input("Enter location to search: ")
         turfs = list(filter(lambda x: x.location ==
-                     location, Turf.printTurfs()))
+                     location, Turf.print_turfs()))
         if(turfs == []):
             print("no turfs is specified location")
         else:
             for turf in turfs:
                 print(turf)
 
-    def checkTurfavailable(self, turfId, startTime):
+    def check_turf_available(self, turf_id, start_time):
+        """Function to check whether given turf is available at given time """
         bookings = list(filter(lambda x: x.status ==
-                        "APPROVED" and x.startTime[0:8] == startTime[0:8], Booking.getAllBooking()))
-        currentBookingHours = []
+                        "APPROVED" and x.start_time[0:8] == start_time[0:8], Booking.getAllBooking()))
+        current_booking_hours = []
         for booking in bookings:
-            start = int(booking.startTime[9:11])
+            start = int(booking.start_time[9:11])
             for i in range(start, start+booking.duration):
-                currentBookingHours.append(i)
+                current_booking_hours.append(i)
         # TODO modify to include duration also
-        return not int(startTime[9:11]) in currentBookingHours
+        return not int(start_time[9:11]) in current_booking_hours
 
-    def checkAvailability(self):
-        self.checkTurf()
-        turfId = int(input("Enter turf Id: "))
-        startTime = input("Enter date and time in DD-MM-YY HH format: ")
-        if(self.checkTurfavailable(turfId, startTime)):
+    def check_availibilty(self):
+        """Function prompt customer for turf id and time and use check_turf_available function to check whether turf is available at that time"""
+        self.check_turf()
+        turf_id = int(input("Enter turf Id: "))
+        start_time = input("Enter date and time in DD-MM-YY HH format: ")
+        if(self.check_turf_available(turf_id, start_time)):
             print("Turf available at given time")
         else:
             print("Turf not available at given time")
 
-    def bookTurf(self):
-        turfId = int(input("Enter turf Id: "))
-        startTime = input("Enter date and time in DD-MM-YY HH format: ")
+    def book_turf(self):
+        """Function to book turf for customer """
+        turf_id = int(input("Enter turf Id: "))
+        start_time = input("Enter date and time in DD-MM-YY HH format: ")
         duration = input("Enter No. of hours turf is needed: ")
-        if(self.checkTurfavailable(turfId, startTime)):
+        if(self.check_turf_available(turf_id, start_time)):
             # TODO create booking object and save to db
-            booking = Booking(0, turfId, self.id, "PENDING",
-                              startTime, duration, 0)
+            booking = Booking(0, turf_id, self.id, "PENDING",
+                              start_time, duration, 0)
             Booking.save(booking)
         else:
             print("Turf not available at given time")
 
-    def bookingHistory(self):
-        userMap = {}
-        turfMap = {}
-        turfList = []
-        for user in User.getAllUsers():
-            userMap[user.id] = user
-        for turf in Turf.printTurfs():
-            turfMap[turf.id] = turf
-            if(turf.managerId == self.id and self.userType == "MANAGER"):
-                turfList.append(turf.id)
+    def booking_history(self):
+        """Function to view the booking history for customer"""
+        user_map = {}
+        turf_map = {}
+        turf_list = []
+        for user in User.get_all_users():
+            user_map[user.id] = user
+        for turf in Turf.print_turfs():
+            turf_map[turf.id] = turf
+            if(turf.manager_id == self.id and self.user_type == "MANAGER"):
+                turf_list.append(turf.id)
         bookings = Booking.getAllBooking()
-        if(self.userType == "MANAGER"):
+        if(self.user_type == "MANAGER"):
             bookings = list(
-                filter(lambda booking: booking.turfId in turfList, bookings))
-        elif(self.userType == "NORMAL"):
+                filter(lambda booking: booking.turf_id in turf_list, bookings))
+        elif(self.user_type == "NORMAL"):
             bookings = list(
                 filter(lambda booking: booking.userId == self.id, bookings))
         for booking in bookings:
-            print("BookingId:{} User:{} Status:{} TurfName:{} StartTime:{} Duration:{}Hrs Cost:Rs.{}".format(
-                booking.id, userMap[booking.userId].name, booking.status, turfMap[booking.turfId].name, booking.startTime, booking.duration, booking.cost))
+            print("booking_id:{} User:{} Status:{} TurfName:{} start_time:{} Duration:{}Hrs Cost:Rs.{}".format(
+                booking.id, user_map[booking.userId].name, booking.status, turf_map[booking.turf_id].name, booking.start_time, booking.duration, booking.cost))
 
-    def addToDatabase(self):
-        self.db.addUserToDataBase(self)
+    def add_to_database(self):
+        """Function to add customer details to database"""
+        self.db.add_userToDataBase(self)
 
     @staticmethod
-    def getAllUsers():
-        usersList = Database().getAllUsers()
+    def get_all_users():
+        """Function to get details of all customer"""
+        users_list = Database().get_all_users()
         users = []
-        for user in usersList:
+        for user in users_list:
             users.append(User(user[0], user[1], None))
         return users
 
-    def printMenu(self):
+    def print_menu(self):
+        """Function to print menu for customer """
         option = 1
         while option != 5:
             print("\nMENU")
@@ -110,10 +121,10 @@ class User:
             print("5. Exit")
             option = int(input("Enter your choice: "))
             if(option == 1):
-                self.checkTurf()
+                self.check_turf()
             elif(option == 2):
-                self.checkAvailability()
+                self.check_availibilty()
             elif(option == 3):
-                self.bookTurf()
+                self.book_turf()
             elif(option == 4):
-                self.bookingHistory()
+                self.booking_history()

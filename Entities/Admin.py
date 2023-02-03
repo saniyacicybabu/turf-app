@@ -5,39 +5,44 @@ from Entities.Booking import Booking
 
 
 class Admin(User):
+    """Admin Class to store and modify Admin details"""
 
-    def setManager(self):
-        turfs = Turf.printTurfs()
+    def set_manager(self):
+
+        """Function to enter the details of Admin"""
+        turfs = Turf.print_turfs()
         for turf in turfs:
             print(turf)
-        turfId = int(input("Enter turf id to assign manager: "))
+        turf_id = int(input("Enter turf id to assign manager: "))
         try:
-            turf = list(filter(lambda x: (x.id == turfId), turfs))[0]
+            turf = list(filter(lambda x: (x.id == turf_id), turfs))[0]
         except:
             print("Provided turf id doesnot exist")
             return
-        managers = Manager.printManagers()
+        managers = Manager.print_managers()
         for manager in managers:
             print(manager)
-        managerId = int(input("Enter new manager's id: "))
+        manager_id = int(input("Enter new manager's id: "))
         try:
-            manager = list(filter(lambda x: (x.id == managerId), managers))[0]
+            manager = list(filter(lambda x: (x.id == manager_id), managers))[0]
         except:
             print("Provided manager id doesnot exist")
             return
-        turf.managerId = managerId
+        turf.manager_id = manager_id
         if(Turf.save(turf) > 0):
             print("Updated Successfully")
         else:
             print("Update failed")
 
-    def setPriceList(self):
-        turfs = Turf.printTurfs()
+    def set_price_list(self):
+        """Function to set the price list of turf"""
+
+        turfs = Turf.print_turfs()
         for turf in turfs:
             print(turf)
-        turfId = int(input("Enter turf id to set price: "))
+        turf_id = int(input("Enter turf id to set price: "))
         try:
-            turf = list(filter(lambda x: (x.id == turfId), turfs))[0]
+            turf = list(filter(lambda x: (x.id == turf_id), turfs))[0]
         except:
             print("Provided turf id doesnot exist")
             return
@@ -47,29 +52,33 @@ class Admin(User):
         else:
             print("Update failed")
 
-    def addTurf(self):
+    def add_turf(self):
+        """Function to add turf """
         name = input("Enter turf name: ")
         location = input("Enter turf location: ")
         turf = Turf(0, name, location)
-        turf.addToDatabase()
+        turf.add_to_database()
 
-    def viewBookings(self):
-        self.bookingHistory()
+    def view_bookings(self):
+        """Function to view the booking history of turf"""
+        self.booking_history()
 
-    def addUser(self):
-        name = input("Enter username: ")
+    def add_user(self):
+        """Function to add Manager and customer"""
+        name = input("Enter user_name: ")
         password = input("Enter password: ")
-        userType = input("Enter user type - 1.Manager 2.Normal: ")
+        user_type = input("Enter user type - 1.Manager 2.Normal: ")
         phone = int(input("Enter user phone number: "))
         email = input("Enter user email id: ")
         user = None
-        if(userType == "1"):
+        if(user_type == "1"):
             user = User(0, name, password, "MANAGER", 1, phone, email)
         else:
-            user = User(0, name, password, "MANAGER", 1, phone, email)
-        user.addToDatabase()
+            user = User(0, name, password, "NORMAL", 1, phone, email)
+        user.add_to_database()
 
-    def printMenu(self):
+    def print_menu(self):
+        """Function to print available menu for Admin"""
         option = 1
         while option != 6:
             print("\nMENU")
@@ -81,12 +90,12 @@ class Admin(User):
             print("6. Exit")
             option = int(input("Enter your choice: "))
             if(option == 1):
-                self.addUser()
+                self.add_user()
             elif(option == 2):
-                self.addTurf()
+                self.add_turf()
             elif(option == 3):
-                self.setManager()
+                self.set_manager()
             elif(option == 4):
-                self.setPriceList()
+                self.set_price_list()
             elif(option == 5):
-                self.viewBookings()
+                self.view_bookings()
