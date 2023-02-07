@@ -7,9 +7,10 @@ from Entities.BillingException import BillingException
 
 class Manager(User):
     """Manager class to add, modify and delete the manager details"""
-    def check_rates(self):
+    def checkRates(self):
         for turf in Turf.print_turfs():
             if(turf.manager_id == self.id):
+                print(" Turf Rates are:")
                 print(turf)
 
     def view_request(self):
@@ -19,17 +20,18 @@ class Manager(User):
             if(turf.manager_id == self.id):
                 turf_list.append(turf.id)
         bookings = list(filter(lambda booking: booking.status ==
-                        "PENDING" and booking.turf_id in turf_list, Booking.getAllBooking()))
+                        "PENDING" and booking.turf_id in turf_list, Booking.get_all_booking()))
         if(bookings == []):
             print("No requests pending to be viewed")
         else:
             for booking in bookings:
+                print(" Pending requests are:")
                 print(booking)
 
     def confirm_booking(self):
         """To confirm booking"""
         bookings = list(filter(lambda booking: booking.status ==
-                        "PENDING", Booking.getAllBooking()))
+                        "PENDING", Booking.get_all_booking()))
         booking_id = int(input("Enter booking Id: "))
         booking = list(
             filter(lambda booking: booking.id == booking_id, bookings))
@@ -39,13 +41,14 @@ class Manager(User):
             option = int(input("Choose an option 1.Approve 2.Reject: "))
             booking[0].status = "APPROVED" if option == 1 else "REJECTED"
             Booking.save(booking[0])
+            print(" Booking Confirmed")
 
     def generate_bill(self):
         """To generate Bill"""
         booking_id = int(input("Enter the booking id: "))
         try:
             bookings = list(
-                filter(lambda x: x.id == booking_id, Booking.getAllBooking()))
+                filter(lambda x: x.id == booking_id, Booking.get_all_booking()))
             if(bookings == []):
                 raise BillingException
             booking = bookings[0]
@@ -65,19 +68,19 @@ class Manager(User):
                 booking.turf_id, turf_map[booking.turf_id].name))
             file.write("Booking Status :{}\n".format(booking.status))
             file.write("Start Time:{} Duration:{}Hrs. Cost:Rs.{}/-\n".format(
-                booking.duration, booking.start_time, booking.cost))
+                booking.start_time, booking.duration, booking.cost))
             file.write("=================================================")
             file.close()
         except BillingException:
             print("Billing Id not found.")
 
-    def booking_history(self):
+    def bookings_history(self):
         self.booking_history()
 
     @staticmethod
     def print_managers():
         """To print manager details"""
-        manager_list = Database().getAllManagers()
+        manager_list = Database().get_all_managers()
         managers = []
         for manager in manager_list:
             managers.append(Manager(manager[0], manager[1], None))
@@ -96,7 +99,7 @@ class Manager(User):
             print("6. Exit")
             option = int(input("Enter your choice: "))
             if(option == 1):
-                self.check_rates()
+                self.checkRates()
             elif(option == 2):
                 self.view_request()
             elif(option == 3):
@@ -104,4 +107,4 @@ class Manager(User):
             elif(option == 4):
                 self.generate_bill()
             elif(option == 5):
-                self.booking_history()
+                self.bookings_history()

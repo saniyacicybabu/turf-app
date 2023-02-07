@@ -2,20 +2,21 @@ from Entities.User import User
 from Entities.Turf import Turf
 from Entities.Manager import Manager
 from Entities.Booking import Booking
-
+from getpass import getpass
 
 class Admin(User):
     """Admin Class to store and modify Admin details"""
 
     def set_manager(self):
-
         """Function to enter the details of Admin"""
         turfs = Turf.print_turfs()
+        print("\n Available Turfs are:")
         for turf in turfs:
             print(turf)
         turf_id = int(input("Enter turf id to assign manager: "))
         try:
             turf = list(filter(lambda x: (x.id == turf_id), turfs))[0]
+            print("\n Available Managers are:")
         except:
             print("Provided turf id doesnot exist")
             return
@@ -36,7 +37,7 @@ class Admin(User):
 
     def set_price_list(self):
         """Function to set the price list of turf"""
-
+        print("\n Available Turfs are:")
         turfs = Turf.print_turfs()
         for turf in turfs:
             print(turf)
@@ -57,25 +58,29 @@ class Admin(User):
         name = input("Enter turf name: ")
         location = input("Enter turf location: ")
         turf = Turf(0, name, location)
-        turf.add_to_database()
+        print("\n Turf details added successfully")
+        turf.add_to_db()
 
     def view_bookings(self):
         """Function to view the booking history of turf"""
+        print("\n Bookings done are:")
         self.booking_history()
 
     def add_user(self):
         """Function to add Manager and customer"""
         name = input("Enter user_name: ")
-        password = input("Enter password: ")
+        password = getpass()
         user_type = input("Enter user type - 1.Manager 2.Normal: ")
         phone = int(input("Enter user phone number: "))
         email = input("Enter user email id: ")
         user = None
         if(user_type == "1"):
             user = User(0, name, password, "MANAGER", 1, phone, email)
+            print("\n New Manager registered successfully")
         else:
             user = User(0, name, password, "NORMAL", 1, phone, email)
-        user.add_to_database()
+            print("\n New User registered successfully")
+        user.add_to_db()
 
     def print_menu(self):
         """Function to print available menu for Admin"""

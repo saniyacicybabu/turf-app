@@ -18,9 +18,9 @@ class Booking:
         return "Booking id:{} Turf Id:{} User id:{} Status:{} Start time:{} Duration:{} Hours Cost:Rs.{}".format(self.id, self.turf_id, self.userId, self.status, self.start_time, self.duration, self.cost)
 
     @staticmethod
-    def getAllBooking():
+    def get_all_booking():
         """Function to retreive all booking details of turf """
-        response = Database().getAllBookings()
+        response = Database().get_all_bookings()
         bookings = []
         for elem in response:
             bookings.append(Booking(elem[0], elem[1], elem[2],
@@ -30,4 +30,4 @@ class Booking:
     @staticmethod
     def save(booking):
         """Function to add the booking details of Turf"""
-        Database().saveBooking(booking)
+        Database().save_booking(booking)
