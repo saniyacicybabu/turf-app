@@ -3,7 +3,7 @@ import sqlite3
 
 
 class Database:
-    def initializeDatabase(self):
+    def initialize_database(self):
         """Function to add python to database"""
         conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
         file = open("Database/DDL_Scripts.sql", "r")
@@ -13,7 +13,7 @@ class Database:
             conn.execute(query)
         conn.close()
 
-    def add_userToDataBase(self, user):
+    def add_user_to_db(self, user):
         """Function to add user details to database"""
         conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
         query = "INSERT INTO USER (NAME, PASSWORD, USER_TYPE, IS_ACTIVE, PHONE, EMAIL) VALUES ('{}','{}','{}',1,{},'{}')".format(
@@ -22,7 +22,7 @@ class Database:
         conn.commit()
         conn.close()
 
-    def saveBooking(self, booking):
+    def save_booking(self, booking):
         """Function to add and update Booking details to database"""
         conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
         if(booking.id == 0):
@@ -35,7 +35,7 @@ class Database:
         conn.commit()
         conn.close()
 
-    def add_turfToDataBase(self, turf):
+    def add_turf_to_db(self, turf):
         """Function to add turf details to database"""
         conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
         query = "INSERT INTO TURF (NAME, LOCATION, IS_ACTIVE) VALUES ('{}','{}',1)".format(
@@ -44,7 +44,7 @@ class Database:
         conn.commit()
         conn.close()
 
-    def getAllTurfs(self):
+    def get_all_turfs(self):
         """Function to retrieve all turf details from database"""
         conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
         cursor = conn.cursor()
@@ -55,7 +55,7 @@ class Database:
         conn.close()
         return output
 
-    def getAllBookings(self):
+    def get_all_bookings(self):
         """Function to retrieve all booking details from databse"""
         conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
         cursor = conn.cursor()
@@ -66,7 +66,7 @@ class Database:
         conn.close()
         return output
 
-    def getAllManagers(self):
+    def get_all_managers(self):
         """Function to retrieve all managers from databse"""
         conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
         cursor = conn.cursor()
@@ -77,7 +77,7 @@ class Database:
         conn.close()
         return output
 
-    def updateTurfToDataBase(self, turf):
+    def update_turf_to_db(self, turf):
         """Function to update turf details in database """
         conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
         cursor = conn.cursor()
@@ -114,4 +114,4 @@ class Database:
 
 
 if __name__ == "__main__":
-    Database().initializeDatabase()
+    Database().initialize_database()
