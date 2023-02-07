@@ -1,12 +1,12 @@
 from Entities.User import User
 from Entities.Admin import Admin
 from Entities.Manager import Manager
-
+from getpass import getpass
 
 def print_menu():
     """Function to display the main menu of Turf"""""
     user_name = input("Enter user_name: ")
-    password = input("Enter password: ")
+    password = getpass()
     user = User(0, user_name, password)
     user = user.login()
     if(user is None):
