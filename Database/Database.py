@@ -1,52 +1,64 @@
-
+"""doc"""
 import sqlite3
 
 
 class Database:
+    """doc"""
+
     def initialize_database(self):
-        """Function to add python to database"""
-        conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
-        file = open("Database/DDL_Scripts.sql", "r")
+        """doc"""
+        conn = sqlite3.connect("Data/PlayGround_Booking_System.db")
+        file = open("Database/DDL_Scripts.sql", mode="r", encoding="utf-8")
         queries = file.readlines()
         file.close()
         for query in queries:
             conn.execute(query)
         conn.close()
 
-    def add_user_to_db(self, user):
-        """Function to add user details to database"""
-        conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
-        query = "INSERT INTO USER (NAME, PASSWORD, USER_TYPE, IS_ACTIVE, PHONE, EMAIL) VALUES ('{}','{}','{}',1,{},'{}')".format(
-            user.name, user.password, user.user_type, user.phone, user.email)
+    def add_user_to_database(self, user):
+        """doc"""
+        conn = sqlite3.connect("Data/PlayGround_Booking_System.db")
+        query = "INSERT INTO USER (NAME, PASSWORD, USER_TYPE, IS_ACTIVE, PHONE, EMAIL) VALUES "
+        query = query + f"('{user.name}', '{user.password}', '{user.user_type}', 1, "
+        query = query + f"{user.phone}, '{user.email}')"
         conn.execute(query)
         conn.commit()
         conn.close()
 
     def save_booking(self, booking):
-        """Function to add and update Booking details to database"""
-        conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
-        if(booking.id == 0):
-            query = "INSERT INTO BOOKING (TURF_ID, USER_ID, STATUS, START_TIME, DURATION, COST) VALUES({},{},'{}','{}',{},{}*(SELECT BOOKING_RATE FROM TURF WHERE ID={}))".format(
-                booking.turf_id, booking.userId, booking.status, booking.start_time, booking.duration, booking.duration, booking.turf_id)
+        """doc"""
+        conn = sqlite3.connect("Data/PlayGround_Booking_System.db")
+        if booking.id == 0:
+            query = "INSERT INTO BOOKING (TURF_ID, USER_ID, STATUS, START_TIME, DURATION, COST)"
+            query = (
+                query
+                + f" VALUES({booking.turf_id},{booking.user_id},'{booking.status}',"
+            )
+            query = (
+                query + f"'{booking.start_time}',{booking.duration},{booking.duration}*"
+            )
+            query = (
+                query + f"(SELECT BOOKING_RATE FROM TURF WHERE ID={booking.turf_id}))"
+            )
         else:
-            query = "UPDATE BOOKING SET STATUS='{}' WHERE ID = {}".format(
-                booking.status, booking.id)
+            query = (
+                f"UPDATE BOOKING SET STATUS='{booking.status}' WHERE ID = {booking.id}"
+            )
         conn.execute(query)
         conn.commit()
         conn.close()
 
-    def add_turf_to_db(self, turf):
-        """Function to add turf details to database"""
-        conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
-        query = "INSERT INTO TURF (NAME, LOCATION, IS_ACTIVE) VALUES ('{}','{}',1)".format(
-            turf.name, turf.location, turf.bookingRate)
+    def add_turf_to_database(self, turf):
+        """doc"""
+        conn = sqlite3.connect("Data/PlayGround_Booking_System.db")
+        query = f"INSERT INTO TURF (NAME, LOCATION, IS_ACTIVE) VALUES ('{turf.name}','{turf.location}',1)"
         conn.execute(query)
         conn.commit()
         conn.close()
 
     def get_all_turfs(self):
-        """Function to retrieve all turf details from database"""
-        conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
+        """doc"""
+        conn = sqlite3.connect("Data/PlayGround_Booking_System.db")
         cursor = conn.cursor()
         query = "SELECT * FROM TURF WHERE IS_ACTIVE=1"
         cursor.execute(query)
@@ -56,8 +68,8 @@ class Database:
         return output
 
     def get_all_bookings(self):
-        """Function to retrieve all booking details from databse"""
-        conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
+        """doc"""
+        conn = sqlite3.connect("Data/PlayGround_Booking_System.db")
         cursor = conn.cursor()
         query = "SELECT * FROM BOOKING"
         cursor.execute(query)
@@ -67,8 +79,8 @@ class Database:
         return output
 
     def get_all_managers(self):
-        """Function to retrieve all managers from databse"""
-        conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
+        """doc"""
+        conn = sqlite3.connect("Data/PlayGround_Booking_System.db")
         cursor = conn.cursor()
         query = "SELECT * FROM USER WHERE USER_TYPE='MANAGER' AND IS_ACTIVE=1"
         cursor.execute(query)
@@ -77,12 +89,15 @@ class Database:
         conn.close()
         return output
 
-    def update_turf_to_db(self, turf):
-        """Function to update turf details in database """
-        conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
+    def update_turf_to_database(self, turf):
+        """doc"""
+        conn = sqlite3.connect("Data/PlayGround_Booking_System.db")
         cursor = conn.cursor()
-        query = "UPDATE TURF SET BOOKING_RATE={},MANAGER_ID={} WHERE ID={}".format(
-            turf.bookingRate if turf.bookingRate != None else 'NULL', turf.manager_id if turf.manager_id != None else 'NULL', turf.id)
+        if turf.booking_rate is None:
+            turf.booking_rate = "NULL"
+        if turf.manager_id is None:
+            turf.manager_id = "NULL"
+        query = f"UPDATE TURF SET BOOKING_RATE={turf.booking_rate},MANAGER_ID={turf.manager_id} WHERE ID={turf.id}"
         cursor.execute(query)
         success = cursor.rowcount
         conn.commit()
@@ -90,11 +105,11 @@ class Database:
         return success
 
     def login(self, user):
-        """Function to retrieve credentials of given user from database"""
-        conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
+        """doc"""
+        conn = sqlite3.connect("Data/PlayGround_Booking_System.db")
         cursor = conn.cursor()
-        query = "SELECT * FROM USER WHERE NAME='{}' AND PASSWORD='{}' AND IS_ACTIVE=1".format(
-            user.name, user.password)
+        query = f"SELECT * FROM USER WHERE NAME='{user.name}' AND "
+        query = query + f"PASSWORD='{user.password}' AND IS_ACTIVE=1"
         cursor.execute(query)
         output = cursor.fetchall()
         conn.commit()
@@ -102,10 +117,29 @@ class Database:
         return output
 
     def get_all_users(self):
-        """Function to retrieve all user details from database"""
-        conn = sqlite3.connect('Data/PlayGround_Booking_System.db')
+        """doc"""
+        conn = sqlite3.connect("Data/PlayGround_Booking_System.db")
         cursor = conn.cursor()
         query = "SELECT * FROM USER WHERE USER_TYPE='NORMAL'"
+        cursor.execute(query)
+        output = cursor.fetchall()
+        conn.commit()
+        conn.close()
+        return output
+
+    def add_card_to_db(self, card):
+        """doc"""
+        conn = sqlite3.connect("Data/PlayGround_Booking_System.db")
+        query = f"INSERT INTO CARD_DETAIL (USER_ID, CARD_NUMBER, CVV) VALUES ({card.user_id},{card.card_number},{card.cvv})"
+        conn.execute(query)
+        conn.commit()
+        conn.close()
+
+    def fetch_all_cards(self):
+        """doc"""
+        conn = sqlite3.connect("Data/PlayGround_Booking_System.db")
+        cursor = conn.cursor()
+        query = "SELECT * FROM CARD_DETAIL"
         cursor.execute(query)
         output = cursor.fetchall()
         conn.commit()
