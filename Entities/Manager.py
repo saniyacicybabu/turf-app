@@ -1,80 +1,122 @@
-from Entities.User import User
-from Database.Database import Database
-from Entities.Turf import Turf
-from Entities.Booking import Booking
-from Entities.BillingException import BillingException
+"""import statements"""
+from Database.database import Database
+from Entities.billing_exception import BillingException
+from Entities.booking import Booking
+from Entities.turf import Turf
+from Entities.user import User
 
 
 class Manager(User):
     """Manager class to add, modify and delete the manager details"""
-    def checkRates(self):
+
+    def check_rates(self):
+        """doc"""
         for turf in Turf.print_turfs():
-            if(turf.manager_id == self.id):
-                print(" Turf Rates are:")
+            if turf.manager_id == self.id:
+                print("Turf details are:")
                 print(turf)
 
     def view_request(self):
         """To view request"""
         turf_list = []
         for turf in Turf.print_turfs():
-            if(turf.manager_id == self.id):
+            if turf.manager_id == self.id:
                 turf_list.append(turf.id)
-        bookings = list(filter(lambda booking: booking.status ==
-                        "PENDING" and booking.turf_id in turf_list, Booking.get_all_booking()))
-        if(bookings == []):
+        bookings = list(
+            filter(
+                lambda booking: booking.status == "PENDING"
+                and booking.turf_id in turf_list,
+                Booking.get_all_booking(),
+            )
+        )
+        if not bookings:
             print("No requests pending to be viewed")
         else:
+            print("Pending requests are:")
             for booking in bookings:
-                print(" Pending requests are:")
                 print(booking)
 
     def confirm_booking(self):
         """To confirm booking"""
-        bookings = list(filter(lambda booking: booking.status ==
-                        "PENDING", Booking.get_all_booking()))
+        turf_list = []
+        for turf in Turf.print_turfs():
+            if turf.manager_id == self.id:
+                turf_list.append(turf.id)
+        bookings = list(
+            filter(
+                lambda booking: booking.status == "PENDING"
+                and booking.turf_id in turf_list,
+                Booking.get_all_booking(),
+            )
+        )
+        if not bookings:
+            print("No bookings left to approve/reject")
+            return
         booking_id = int(input("Enter booking Id: "))
-        booking = list(
-            filter(lambda booking: booking.id == booking_id, bookings))
-        if(booking == []):
+        booking = list(filter(lambda booking: booking.id == booking_id, bookings))
+        if not booking:
             print("Entered id doesn't exist.")
         else:
+            booking = booking[0]
             option = int(input("Choose an option 1.Approve 2.Reject: "))
-            booking[0].status = "APPROVED" if option == 1 else "REJECTED"
-            Booking.save(booking[0])
-            print(" Booking Confirmed")
+            bookable = User.check_turf_available(
+                booking.turf_id, booking.start_time, booking.duration
+            )
+            if option == 1 and not bookable:
+                print("Turf already booked at provided time. cannot approve")
+                return
+            # booking.status = "APPROVED"
+            if option == 1:
+                booking.status = "APPROVED"
+                print("Booking approved")
+
+            else:
+                "REJECTED"
+                print("Booking Rejected")
+                Booking.save(booking)
 
     def generate_bill(self):
         """To generate Bill"""
         booking_id = int(input("Enter the booking id: "))
         try:
             bookings = list(
-                filter(lambda x: x.id == booking_id, Booking.get_all_booking()))
-            if(bookings == []):
+                filter(lambda x: x.id == booking_id, Booking.get_all_booking())
+            )
+            if not bookings:
                 raise BillingException
             booking = bookings[0]
-            user_map={}
-            turf_map={}
+            user_map = {}
+            turf_map = {}
             for user in User.get_all_users():
                 user_map[user.id] = user
             for turf in Turf.print_turfs():
                 turf_map[turf.id] = turf
-            file = open("Data/Bill-Booking-{}.txt".format(booking.id), "w")
+            file = open(
+                f"Data/Bill-Booking-{booking.id}.txt", mode="w", encoding="utf-8"
+            )
             file.write("=================================================\n")
-            file.write("Billing Detail for Booking ID:{}\n".format(booking.id))
+            file.write(f"Billing Detail for Booking ID:{booking.id}\n")
             file.write("=================================================\n")
-            file.write("User ID:{}     User Name:{}\n".format(
-                booking.userId, user_map[booking.userId].name))
-            file.write("Turf ID:{}     Turf Name:{}\n".format(
-                booking.turf_id, turf_map[booking.turf_id].name))
-            file.write("Booking Status :{}\n".format(booking.status))
-            file.write("Start Time:{} Duration:{}Hrs. Cost:Rs.{}/-\n".format(
-                booking.start_time, booking.duration, booking.cost))
+            file.write(
+                f"User ID:{booking.user_id}     User Name:{user_map[booking.user_id].name}\n"
+            )
+            file.write(
+                f"Turf ID:{booking.turf_id}     Turf Name:{turf_map[booking.turf_id].name}\n"
+            )
+            file.write(f"Booking Status :{booking.status}\n")
+            file.write(
+                f"Start Time:{booking.start_time} Duration:{booking.duration}Hrs. "
+            )
+            file.write(f"Cost:Rs.{booking.cost}/-\n")
             file.write("=================================================")
             file.close()
+            print("Bill generated for Booking" + str(booking.id))
         except BillingException:
             print("Billing Id not found.")
 
     def bookings_history(self):
+        """To view booking history"""
+        print("Your Booking History is:")
         self.booking_history()
 
     @staticmethod
@@ -88,23 +130,25 @@ class Manager(User):
 
     def print_menu(self):
         """Print menu for manager options"""
-        option = 1
-        while option != 6:
+        option = "1"
+        while option != "6":
             print("\nMENU")
             print("1. Check rates")
             print("2. View requests")
             print("3. Confirm/Reject booking")
             print("4. Generate Bill")
             print("5. View booking history")
-            print("6. Exit")
-            option = int(input("Enter your choice: "))
-            if(option == 1):
-                self.checkRates()
-            elif(option == 2):
+            print("6. Logout")
+            option = input("Enter your choice: ")
+            if option == "1":
+                self.check_rates()
+            elif option == "2":
                 self.view_request()
-            elif(option == 3):
+            elif option == "3":
                 self.confirm_booking()
-            elif(option == 4):
+            elif option == "4":
                 self.generate_bill()
-            elif(option == 5):
+            elif option == "5":
                 self.bookings_history()
+            elif option != "6":
+                print("Invalid Choice")
